@@ -32,7 +32,7 @@ wave2 <- probs_qtl2_to_doqtl(wave2)
 
 
 
-### Making a dataframe of 'DO-###' and original sample name of wave1 and wave2
+### Making a dataframe of 'DO-###' and original sample names for wave1 and wave2
 wave1_name <- dimnames(wave1)[[1]] %>%
                                    data.frame(orig_genoprobs_name = .) %>%
                                    separate(orig_genoprobs_name, into = c('Size', 'File', 'DO', 'End'), sep = '_')  %>%
@@ -67,7 +67,7 @@ wave_name  <- rbind(wave1_name, wave2_name)
 
 
 
-
+### Create new array by getting genoprobs from wave1 and wave2 and arranging them by DO number
 stopifnot(dim(wave1)[3] == dim(wave2)[3])
 stopifnot(dimnames(wave1)[[3]] == dimnames(wave1)[[3]])
 new_array <- array(0, dim = c(219, 8 , dim(wave1)[3]), dimnames = list(wave_name$DO, LETTERS[1:8], dimnames(wave1)[[3]]))
@@ -85,6 +85,8 @@ for(i in 124:219){
 
 
 
+
+### Create new marker map
 markers <- snps %>%
                 dplyr::mutate(chr = gsub('chr', '', chr, fixed = FALSE)) %>%
                 filter(chr %in% c(1:19,'X')) %>%
@@ -94,13 +96,22 @@ markers <- snps %>%
                 select(chr, marker, cM, pos, rsID) %>%
                 filter(marker %in% dimnames(new_array)[[3]])
 
+
+
+### Create new marker map list
 map <- map_df_to_list(map = markers,
                       chr_column = 'chr',
                       pos_column = 'pos')
 
+
+
+### Convert new array to qtl2 genoprobs format
 genoprobs <- probs_doqtl_to_qtl2(new_array, map = markers, pos_column = 'pos')
 
 
+
+
+### Compute Kinship
 K <- calc_kinship(probs = genoprobs,
                   type = 'loco',
                   cores = 10)
