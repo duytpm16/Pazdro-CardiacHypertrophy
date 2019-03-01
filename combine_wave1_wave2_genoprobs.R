@@ -75,6 +75,7 @@ new_array <- array(0, dim = c(219, 8 , dim(wave1)[3]), dimnames = list(wave_name
 for(i in 1:dim(wave1)[1]){
     new_array[i,,] <- wave1[wave_name$orig_genoprobs_name[i],,]
 }
+# Hardcoding the index...
 for(i in 124:219){
     new_array[i,,] <- wave2[wave_name$orig_genoprobs_name[i],,]
 }
