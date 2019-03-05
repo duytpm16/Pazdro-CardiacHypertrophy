@@ -93,7 +93,8 @@ markers <- snps %>%
                 filter(chr %in% c(1:19,'X')) %>%
                 dplyr::mutate(bp  = as.numeric(pos),
                               chr = factor(chr, levels = c(1:19,'X')),
-                              pos = as.numeric(pos) / 1e6) %>%
+                              pos = as.numeric(pos) / 1e6,
+                              marker = as.character(marker)) %>%
                 select(chr, marker, cM, pos, rsID) %>%
                 filter(marker %in% dimnames(new_array)[[3]])
 
