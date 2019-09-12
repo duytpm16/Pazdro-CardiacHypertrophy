@@ -81,7 +81,7 @@ map69k <- map_df_to_list(map = markers69k, chr_column = 'chr', pos_column = 'pos
 
 
 
-### Removing characters in mouse id of genoprobs. Convert genotype probabilties to qtl2
+### Removing characters in mouse id of genoprobs to contain only 'DO-#'. Convert genotype probabilties to qtl2
 dimnames(gigaMuga)[[1]] <- gsub('Large_File_|Small_File_|Wave2_|_[A-Z][0-9]', '', dimnames(gigaMuga)[[1]])
 dimnames(gigaMuga69k)[[1]] <- gsub('Large_File_|Small_File_|Wave2_|_[A-Z][0-9]', '', dimnames(gigaMuga69k)[[1]])
 
