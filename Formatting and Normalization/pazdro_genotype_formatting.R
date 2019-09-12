@@ -10,8 +10,8 @@
 #   Input:
 #     1.) gigaMuga array 
 #     2.) markers for gigaMuga array - http://csbio.unc.edu/MUGA/snps.gigamuga.Rdata
-#     2.) gigaMuga interpolated on 69k grid
-#     3.) markers for 69k grid: Cadillac - /projects/churchill-lab/resource/muga_reference/marker_grid_0.02cM_plus.rds 
+#     3.) gigaMuga interpolated on 69k grid
+#     4.) markers for 69k grid: Cadillac - /projects/churchill-lab/resource/muga_reference/marker_grid_0.02cM_plus.rds 
 #
 # 
 #   Output:
@@ -37,8 +37,8 @@ library(qtl2)
 
 ### Inputs:
 #    1.) gigaMUGA - genotype probabilities: 219 x 8 x 137,220
-#    2.) gigaMUGA69k - genotype probabilities on 69k grid: 219 x 8 x 69,0005
-#    3.) snps - for gigaMUGA
+#    2.) snps - for gigaMUGA
+#    3.) gigaMUGA69k - genotype probabilities on 69k grid: 219 x 8 x 69,0005
 #    4.) marker69k - for 69k grid
 gigaMuga <- readRDS('~/Desktop/Pazdro Cardiac Hypertrophy/Genotypes/UNC/Robert_Pazdro_Large_File__GigaMUGA_probs_8state.rds')
 gigaMuga <- probs_qtl2_to_doqtl(probs = gigaMuga)
@@ -82,8 +82,8 @@ map69k <- map_df_to_list(map = markers69k, chr_column = 'chr', pos_column = 'pos
 
 
 ### Removing characters in mouse id of genoprobs to contain only 'DO-#'. Convert genotype probabilties to qtl2
-dimnames(gigaMuga)[[1]] <- gsub('Large_File_|Small_File_|Wave2_|_[A-Z][0-9]', '', dimnames(gigaMuga)[[1]])
-dimnames(gigaMuga69k)[[1]] <- gsub('Large_File_|Small_File_|Wave2_|_[A-Z][0-9]', '', dimnames(gigaMuga69k)[[1]])
+dimnames(gigaMuga)[[1]] <- gsub('Large_File_|Small_File_|Wave2_|_[A-Z][0-9]+', '', dimnames(gigaMuga)[[1]])
+dimnames(gigaMuga69k)[[1]] <- gsub('Large_File_|Small_File_|Wave2_|_[A-Z][0-9]+', '', dimnames(gigaMuga69k)[[1]])
 
 gigaMuga    <- probs_doqtl_to_qtl2(probs = gigaMuga, map = markers, chr_column = 'chr', pos_column = 'pos', marker_column = 'marker.id')
 gigaMuga69k <- probs_doqtl_to_qtl2(probs = gigaMuga69k, map = markers69k, chr_column = 'chr', pos_column = 'pos', marker_column = 'marker.id')
@@ -114,7 +114,7 @@ genoprobs <- gigaMuga
 markers <- markers
 map <- map
 K <- K
-save(genoprobs, markers, map, K, file = '~/Desktop/pazdro_gigaMUGA_genoprobs_qtl2.Rdata')
+save(genoprobs, markers, map, K, file = '~/Desktop/Pazdro Cardiac Hypertrophy/Genotypes/UNC/pazdro_gigaMUGA_genoprobs_qtl2.Rdata')
 
 
 
@@ -127,4 +127,4 @@ genoprobs <- gigaMuga69k
 markers <- markers69k
 map <- map69k
 K <- K69k
-save(genoprobs, markers, map, K, file = '~/Desktop/pazdro_69k_genoprobs_qtl2.Rdata')
+save(genoprobs, markers, map, K, file = '~/Desktop/Pazdro Cardiac Hypertrophy/Genotypes/69k/pazdro_69k_genoprobs_qtl2.Rdata')
