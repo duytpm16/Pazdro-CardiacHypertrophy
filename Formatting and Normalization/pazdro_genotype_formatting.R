@@ -40,12 +40,12 @@ library(qtl2)
 #    2.) gigaMUGA69k - genotype probabilities on 69k grid: 219 x 8 x 69,0005
 #    3.) snps - for gigaMUGA
 #    4.) marker69k - for 69k grid
-gigaMuga <- readRDS('~/Desktop/Robert_Pazdro_Large_File__GigaMUGA_probs_8state.rds')
+gigaMuga <- readRDS('~/Desktop/Pazdro Cardiac Hypertrophy/Genotypes/UNC/Robert_Pazdro_Large_File__GigaMUGA_probs_8state.rds')
 gigaMuga <- probs_qtl2_to_doqtl(probs = gigaMuga)
-load('~/Downloads/snps.gigamuga.Rdata')
+load('~/Desktop/Pazdro Cardiac Hypertrophy/Genotypes/UNC/snps.gigamuga.Rdata')
 
-gigaMuga69k <- readRDS('~/Desktop/Robert_Pazdro_Large_File__GigaMUGA_probs_8state_69k.rds')
-markers69k  <- readRDS('~/Desktop/marker_grid_0.02cM_plus.rds')
+gigaMuga69k <- readRDS('~/Desktop/Pazdro Cardiac Hypertrophy/Genotypes/69k/Robert_Pazdro_Large_File__GigaMUGA_probs_8state_69k.rds')
+markers69k  <- readRDS('~/Desktop/Pazdro Cardiac Hypertrophy/Genotypes/69k/marker_grid_0.02cM_plus.rds')
 
 
 
@@ -81,7 +81,10 @@ map69k <- map_df_to_list(map = markers69k, chr_column = 'chr', pos_column = 'pos
 
 
 
-### Converting genotype probabilties to qtl2
+### Removing characters in mouse id of genoprobs. Convert genotype probabilties to qtl2
+dimnames(gigaMuga)[[1]] <- gsub('Large_File_|Small_File_|Wave2_|_[A-Z][0-9]', '', dimnames(gigaMuga)[[1]])
+dimnames(gigaMuga69k)[[1]] <- gsub('Large_File_|Small_File_|Wave2_|_[A-Z][0-9]', '', dimnames(gigaMuga69k)[[1]])
+
 gigaMuga    <- probs_doqtl_to_qtl2(probs = gigaMuga, map = markers, chr_column = 'chr', pos_column = 'pos', marker_column = 'marker.id')
 gigaMuga69k <- probs_doqtl_to_qtl2(probs = gigaMuga69k, map = markers69k, chr_column = 'chr', pos_column = 'pos', marker_column = 'marker.id')
 
@@ -125,4 +128,3 @@ markers <- markers69k
 map <- map69k
 K <- K69k
 save(genoprobs, markers, map, K, file = '~/Desktop/pazdro_69k_genoprobs_qtl2.Rdata')
-
