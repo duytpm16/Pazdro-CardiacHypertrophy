@@ -3,7 +3,7 @@
 #     Mandy Chen mandy.chen@jax.org and convert to qtl2 format.
 #
 #
-#   Arrays were obtained on cadillac HPC at /projects/chenm/haplotype/R5/res
+#   Genotype probabilties were obtained on cadillac HPC at /projects/chenm/haplotype/R5/res
 #
 #
 #
