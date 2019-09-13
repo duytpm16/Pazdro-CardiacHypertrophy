@@ -56,7 +56,7 @@ markers69k  <- readRDS('~/Desktop/Pazdro Cardiac Hypertrophy/Genotypes/69k/marke
 
 
 
-### Converting markers to qtl2 list
+### Formatting markers dataframe and create a map qtl2 list
 markers <- snps %>%
             filter(chr %in% paste0('chr', c(1:19,'X'))) %>% 
             filter(marker %in% dimnames(gigaMuga)[[3]]) %>%
