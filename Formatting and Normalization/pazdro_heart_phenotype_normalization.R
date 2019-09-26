@@ -1,5 +1,5 @@
 #####################################################################################################################################
-#   This script is used normalize the heart phenotype data sent by Robert Pazdro
+#   This script is used to normalize the heart phenotype data sent by Robert Pazdro
 #     Data are then formatted for QTL viewer
 #
 #
