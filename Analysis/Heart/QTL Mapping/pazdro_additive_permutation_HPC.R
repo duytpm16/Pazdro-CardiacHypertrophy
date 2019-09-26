@@ -32,9 +32,9 @@ set.seed(12345)
 
 ### Load data
 args <- commandArgs(trailingOnly = TRUE)
-col    <- args[1]
-n_perm <- args[2]
-cores  <- args[3]
+col    <- as.numeric(args[1])
+n_perm <- as.numeric(args[2])
+cores  <- as.numeric(args[3])
 
 load('pazdro_heart_phenotype_viewer_v1.Rdata')
 dataset <- 'dataset.heart.phenotype'
