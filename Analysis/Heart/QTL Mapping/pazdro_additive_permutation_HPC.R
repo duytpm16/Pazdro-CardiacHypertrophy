@@ -99,5 +99,5 @@ if(pheno_name %in% c('GDF11', 'MSTN')){
 
 
 ### Save result
-saveRDS(perm, file = paste0('pazdro_', pheno_name,'_permutation_', n_perm, '.rds'))
+saveRDS(perm, file = paste0('pazdro_', pheno_name,'_additive_permutation_', n_perm, '.rds'))
 
