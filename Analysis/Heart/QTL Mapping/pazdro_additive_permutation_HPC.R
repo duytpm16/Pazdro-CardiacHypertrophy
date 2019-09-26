@@ -1,5 +1,5 @@
 #####################################################################################################################################
-#   This script is used to find significance threshold by permutation for each heart phenotype data sent by Robert Pazdro
+#   This script is used to find additive significance threshold by permutation for each heart phenotype data sent by Robert Pazdro
 #       This runs in parallel on HPC
 #
 #
