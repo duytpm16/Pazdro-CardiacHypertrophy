@@ -145,4 +145,4 @@ saveRDS(scan1_out, file = 'pazdro_heart_phenotype_additive_scan1_matrix.rds')
 
 ### Save .Rdata
 rm(list = ls()[!grepl('dataset[.]|genoprobs|K|map|markers', ls())])
-# save.image(file = 'pazdro_heart_phenotype_viewer_v1.Rdata') 
+save.image(file = 'pazdro_heart_phenotype_viewer_v1.Rdata') 
