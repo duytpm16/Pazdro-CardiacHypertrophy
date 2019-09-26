@@ -114,8 +114,8 @@ dataset.heart.phenotype$lod.peaks$sex_int <- peaks
 
 
 ### Save scan1 matrix
-save(scan1_out, file = 'pazdro_heart_phenotype_sex_int_scan1_matrix.rds')
-save(diff, file = 'pazdro_heart_phenotype_sex_effect_scan1_matrix.rds')
+saveRDS(scan1_out, file = 'pazdro_heart_phenotype_sex_int_scan1_matrix.rds')
+saveRDS(diff, file = 'pazdro_heart_phenotype_sex_effect_scan1_matrix.rds')
 
 
 
