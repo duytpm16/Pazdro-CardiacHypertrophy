@@ -69,7 +69,7 @@ sex.covar <- get(dataset)$covar.matrix[,'sex', drop = FALSE]
 
 
 ### Run permutation for phenotype
-pheno_name <- colnames(expr)[i]
+pheno_name <- colnames(expr)[col]
 
 
 if(pheno_name %in% c('GDF11', 'MSTN')){
