@@ -1,3 +1,26 @@
+#####################################################################################################################################
+#   This script is used normalize the heart phenotype data sent by Robert Pazdro
+#     Data are then formatted for QTL viewer
+#
+#
+#   Genoprobs, map, markers, K were obtained on cadillac HPC at /projects/churchill-lab/data/Pazdro/genotypes/genoprobs/gigaMUGA/qtl2/
+#
+#
+#
+#   Input:
+#     1.) .Rdata file on line 6 above
+#     2.) phenotype data located on cadillac - /projects/churchill-lab/data/Pazdro/phenotypes/heart/
+#
+#
+#   Output:
+#     1.) .Rdata in QTL viewer format
+#
+#
+#
+#   Author: Duy Pham
+#   E-mail: duy.pham@jax.org
+#####################################################################################################################################
+
 ### Options and libraries
 options(stringsAsFactors = FALSE)
 library(tidyverse)
@@ -9,7 +32,7 @@ library(qtl2)
 
 
 ### Load data
-#    1.) GigaMUGA with 137k markers: /projects/churchill-lab/data/Pazdro/genotypes/genoprobs/gigaMUGA/qtl2/
+#    1.) GigaMUGA genoprobs with 137k markers: /projects/churchill-lab/data/Pazdro/genotypes/genoprobs/gigaMUGA/qtl2/
 #    2.) Pazdro's data: /projects/churchill-lab/data/Pazdro/phenotypes/heart/
 load('~/Desktop/Pazdro Cardiac Hypertrophy/Genotypes/UNC/pazdro_gigaMUGA_genoprobs_qtl2.Rdata')
 data <- readRDS('~/Desktop/Pazdro Cardiac Hypertrophy/Phenotype/Modified Phenotype/pazdro_heart_phenotype_cleaned_spreadsheet_plus_echo_2_14_2019.rds')
@@ -40,7 +63,7 @@ annot.sample <- data %>%
 
 
 
-### Raw data
+### Raw data formatting
 data <- data %>%
           remove_rownames() %>%
           column_to_rownames('Mouse.Number') %>% 
@@ -64,7 +87,8 @@ data <- data %>%
 
 
 
-### Normalized data
+
+### Normalize data
 norm <- log(data)
 
 
@@ -193,10 +217,10 @@ annot.phenotype <- data.frame(data.name      = c(colnames(annot.sample), colname
 dataset.heart.phenotype <- list(annot.phenotype = as_tibble(annot.phenotype),
                                 annot.samples   = as_tibble(annot.sample),
                                 covar.matrix    = covar.matrix,
-                                covar.info      = covar.info,
-                                data            = list(raw  = data,
-                                                       norm = norm,
-                                                       rz   = rz),
+                                covar.info      = as_tibble(covar.info),
+                                data            = list(raw  = as.matrix(data),
+                                                       norm = as.matrix(norm),
+                                                       rz   = as.matrix(rz)),
                                 datatype        = 'phenotype',
                                 display.name    = 'Heart physiological phenotypes',
                                 lod.peaks       = list())
