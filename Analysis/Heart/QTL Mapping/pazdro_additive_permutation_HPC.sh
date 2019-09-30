@@ -1,6 +1,6 @@
 ### Parallel permutation scans. Looping from 1-13 because that's how many phenotypes there are in the dataset
 
-for i in {1..13}
+for i in {1..15}
 do
   echo "#PBS -l nodes=1:ppn=8
   module load R/3.5.1
