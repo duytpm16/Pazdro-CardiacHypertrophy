@@ -46,8 +46,7 @@ prot <- expr %>% as.data.frame() %>% select(GDF11, MSTN)
 hw.adj.bw <- expr %>% as.data.frame() %>% select(hw.adj.bw)
 hw.adj.tl <- expr %>% as.data.frame() %>% select(hw.adj.tl)
 
-### Covar contains both sex and batch. Will use this for GDF11 and MSTN mapping.
-#     Other phenotypes will be adjusted by sex (sex.covar) only.
+### Get covariates
 prot.covar <- get(dataset)$covar.matrix[,c('sex','batch'), drop = FALSE]
 sex.covar  <- get(dataset)$covar.matrix[,'sex', drop = FALSE]
 bw.covar   <- get(dataset)$covar.matrix[,c('sex','body.weight'), drop = FALSE]
