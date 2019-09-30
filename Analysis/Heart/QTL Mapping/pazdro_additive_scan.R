@@ -40,15 +40,20 @@ dataset <- 'dataset.heart.phenotype'
 
 
 ### Extract log-transformed expression data
-expr <- get(dataset)$data$norm
-phys <- expr %>% as.data.frame() %>% select(-GDF11, -MSTN)
+expr <- get(dataset)$data$log
+phys <- expr %>% as.data.frame() %>% select(-GDF11, -MSTN, -hw.adj.bw, -hw.adj.tl)
 prot <- expr %>% as.data.frame() %>% select(GDF11, MSTN)
-
+hw.adj.bw <- expr %>% as.data.frame() %>% select(hw.adj.bw)
+hw.adj.tl <- expr %>% as.data.frame() %>% select(hw.adj.tl)
 
 ### Covar contains both sex and batch. Will use this for GDF11 and MSTN mapping.
 #     Other phenotypes will be adjusted by sex (sex.covar) only.
-covar <- get(dataset)$covar.matrix
-sex.covar <- get(dataset)$covar.matrix[,'sex', drop = FALSE]
+prot.covar <- get(dataset)$covar.matrix[,c('sex','batch'), drop = FALSE]
+sex.covar  <- get(dataset)$covar.matrix[,'sex', drop = FALSE]
+bw.covar   <- get(dataset)$covar.matrix[,c('sex','body.weight'), drop = FALSE]
+tl.covar   <- get(dataset)$covar.matrix[,c('sex','tibia.length'), drop = FALSE]
+
+
 
 
 
@@ -63,7 +68,7 @@ sex.covar <- get(dataset)$covar.matrix[,'sex', drop = FALSE]
 prot_scan1 <- scan1(genoprobs = genoprobs,
                     pheno     = prot,
                     kinship   = K,
-                    addcovar  = covar,
+                    addcovar  = prot.covar,
                     cores     = 5)
 
 
@@ -75,8 +80,23 @@ phys_scan1 <- scan1(genoprobs = genoprobs,
                     addcovar  = sex.covar,
                     cores     = 5)
 
+### Map heart weight adjusting for bodyweight
+hw.bw_scan1 <- scan1(genoprobs = genoprobs,
+                     pheno     = hw.adj.bw,
+                     kinship   = K,
+                     addcovar  = bw.covar,
+                     cores     = 5)
+
+
+### Map heart weight adjusting for bodyweight
+hw.tl_scan1 <- scan1(genoprobs = genoprobs,
+                     pheno     = hw.adj.tl,
+                     kinship   = K,
+                     addcovar  = tl.covar,
+                     cores     = 5)
+
 ### Combine scan1 outputs
-scan1_out <- cbind(prot_scan1, phys_scan1)
+scan1_out <- cbind(prot_scan1, phys_scan1, hw.bw_scan1, hw.tl_scan1)
 
 
 
@@ -95,7 +115,6 @@ peaks <- peaks %>%
            rename(data.name = lodcolumn, ci.lo = ci_lo, ci.hi = ci_hi) %>%
            left_join(x = ., y = markers[,c('marker.id', 'chr', 'pos')], by = c('chr', 'pos')) %>%
            select(data.name, marker.id, chr, pos, lod, ci.lo, ci.hi)
-peaks[,LETTERS[1:8]] <- 0
 
 
 
@@ -107,24 +126,31 @@ peaks[,LETTERS[1:8]] <- 0
 
 
 ### Add allele effects
+peaks[,LETTERS[1:8]] <- 0
 for(i in 1:nrow(peaks)){
   
     gp <- genoprobs[,peaks$chr[i]]
     gp[[1]] <- gp[[1]][,,peaks$marker.id[i], drop = FALSE]
+  
+    covar <- switch (peaks$data.name[i],
+                      'GDF11'= prot.covar,
+                      'MSTN' = prot.covar,
+                      'hw.adj.bw' = bw.covar,
+                      'hw.adj.tl' = tl.covar,
+                      sex.covar)
+ 
+  peaks[i,LETTERS[1:8]] <- scan1blup(genoprobs = gp,
+                                     pheno     = expr[,peaks$data.name[i], drop = FALSE],
+                                     kinship   = K[[peaks$chr[i]]],
+                                     addcovar  = covar)[,LETTERS[1:8]]      
     
-    if(peaks$data.name[i] %in% c('GDF11','MSTN')){
-       peaks[i,LETTERS[1:8]] <- scan1blup(genoprobs = gp,
-                                          pheno     = prot[,peaks$data.name[i], drop = FALSE],
-                                          kinship   = K[[peaks$chr[i]]],
-                                          addcovar  = covar)[,LETTERS[1:8]]
-    }else{
-       peaks[i,LETTERS[1:8]] <- scan1blup(genoprobs = gp,
-                                          pheno     = phys[,peaks$data.name[i], drop = FALSE],
-                                          kinship   = K[[peaks$chr[i]]],
-                                          addcovar  = sex.covar)[,LETTERS[1:8]]      
-      
-    }
 }
+
+
+
+
+
+
 
 
 
