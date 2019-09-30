@@ -51,7 +51,7 @@ dataset <- 'dataset.heart.phenotype'
 
 
 ### Extract log-transformed expression data
-expr <- get(dataset)$data$norm
+expr <- get(dataset)$data$log
 
 
 
