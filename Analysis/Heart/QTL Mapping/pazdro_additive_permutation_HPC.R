@@ -45,14 +45,19 @@ dataset <- 'dataset.heart.phenotype'
 
 
 
-### Run permutation for phenotype
-pheno_name <- colnames(expr)[col]
+
 
 
 
 
 ### Extract log-transformed expression data
 expr <- get(dataset)$data$norm
+
+
+
+### Run permutation for phenotype
+pheno_name <- colnames(expr)[col]
+
 
 
 ### Get covariates
