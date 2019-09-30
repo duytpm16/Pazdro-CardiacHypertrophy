@@ -42,15 +42,13 @@ dataset <- 'dataset.heart.phenotype'
 
 
 ### Extract log-transformed expression data
-expr <- get(dataset)$data$norm
-phys <- expr %>% as.data.frame() %>% select(-GDF11, -MSTN)
-prot <- expr %>% as.data.frame() %>% select(GDF11, MSTN)
+expr <- get(dataset)$data$log
 
-
-### Covar contains both sex and batch. Will use this for GDF11 and MSTN mapping.
-#     Other phenotypes will be adjusted by sex (sex.covar) only.
-covar <- get(dataset)$covar.matrix
-sex.covar <- get(dataset)$covar.matrix[,'sex', drop = FALSE]
+### Get covariates
+prot.covar <- get(dataset)$covar.matrix[,c('sex','batch'), drop = FALSE]
+sex.covar  <- get(dataset)$covar.matrix[,'sex', drop = FALSE]
+bw.covar   <- get(dataset)$covar.matrix[,c('sex','body.weight'), drop = FALSE]
+tl.covar   <- get(dataset)$covar.matrix[,c('sex','tibia.length'), drop = FALSE]
 
 
 
@@ -72,12 +70,15 @@ chr_herit <- matrix(0, nrow = length(c(1:19,'X')), ncol = ncol(expr),
 
 for(i in colnames(chr_herit)){
     for(j in c(1:19,'X')){
-        if(i %in% c('GDF11', 'MSTN')){
-           chr_herit[paste0('chr', j), i] <- est_herit(pheno = prot[, i, drop = FALSE], kinship  = K[[j]], addcovar = covar)
-           
-        }else{
-           chr_herit[paste0('chr', j), i] <- est_herit(pheno = phys[, i, drop = FALSE], kinship  = K[[j]], addcovar = sex.covar)           
-        }
+    
+        covar <- switch(i,
+                        'GDF11'= prot.covar,
+                        'MSTN' = prot.covar,
+                        'hw.adj.bw' = bw.covar,
+                        'hw.adj.tl' = tl.covar,
+                        sex.covar)
+    
+        chr_herit[paste0('chr', j), i] <- est_herit(pheno = expr[, i, drop = FALSE], kinship  = K[[j]], addcovar = covar)           
     }
 }
 
@@ -97,13 +98,15 @@ overall_herit <- matrix(0, nrow = 1, ncol = ncol(expr),
 
 
 for(i in colnames(overall_herit)){
-    if(i %in% c('GDF11', 'MSTN')){
-       overall_herit[, i] <- est_herit(pheno = prot[, i, drop = FALSE], kinship  = K_overall, addcovar = covar)
-      
-    }else{
-       overall_herit[, i] <- est_herit(pheno = phys[, i, drop = FALSE], kinship  = K_overall, addcovar = sex.covar)           
-    }
-  }
+
+    covar <- switch (i,
+                     'GDF11'= prot.covar,
+                     'MSTN' = prot.covar,
+                     'hw.adj.bw' = bw.covar,
+                     'hw.adj.tl' = tl.covar,
+                     sex.covar)
+  
+    overall_herit[, i] <- est_herit(pheno = expr[, i, drop = FALSE], kinship  = K_overall, addcovar = covar)           
 }
 
 
