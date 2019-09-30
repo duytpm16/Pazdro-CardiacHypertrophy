@@ -45,49 +45,51 @@ dataset <- 'dataset.heart.phenotype'
 
 
 
+### Run permutation for phenotype
+pheno_name <- colnames(expr)[col]
+
+
 
 
 ### Extract log-transformed expression data
 expr <- get(dataset)$data$norm
 
 
-### Covar contains both sex and batch. Will use this for GDF11 and MSTN mapping.
-#     Other phenotypes will be adjusted by sex (sex.covar) only.
-covar <- get(dataset)$covar.matrix
-sex.covar <- get(dataset)$covar.matrix[,'sex', drop = FALSE]
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Run permutation for phenotype
-pheno_name <- colnames(expr)[col]
-
-
-if(pheno_name %in% c('GDF11', 'MSTN')){
-   perm <- scan1perm(genoprobs = genoprobs,
-                     pheno     = expr[, pheno_name, drop = FALSE],
-                     kinship   = K,
-                     covar     = covar,
-                     n_perm    = n_perm,
-                     cores     = cores)
-   
-}else{
-   perm <- scan1perm(genoprobs = genoprobs,
-                     pheno     = expr[, pheno_name, drop = FALSE],
-                     kinship   = K,
-                     covar     = sex.covar,
-                     n_perm    = n_perm,
-                     cores     = cores)
+### Get covariates
+if(pheno_name %in% c('GDF11', 'MSTN'){
+   covar <- get(dataset)$covar.matrix[,c('sex','batch')]
 }
+if(pheno_name %in% c('hw.adj.bw'){
+   covar <- get(dataset)$covar.matrix[,c('sex','body.weight')]
+}
+if(pheno_name %in% c('hw.adj.tl'){
+   covar <- get(dataset)$covar.matrix[,c('sex','tibia.length')]
+}
+if(!pheno_name %in% c('GDF11', 'MSTN', 'hw.adj.bw', 'hw.adj.tl')){
+   covar <-  get(dataset)$covar.matrix[,'sex', drop = FALSE]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+perm <- scan1perm(genoprobs = genoprobs,
+                  pheno     = expr[, pheno_name, drop = FALSE],
+                  kinship   = K,
+                  covar     = covar,
+                  n_perm    = n_perm,
+                  cores     = cores)
+
 
 
 
