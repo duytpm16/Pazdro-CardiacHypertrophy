@@ -48,8 +48,8 @@ data <- readRDS('~/Desktop/Pazdro Cardiac Hypertrophy/Phenotype/Modified Phenoty
 ### Create samples dataframe
 annot.sample <- data %>% 
                   select(Mouse.Number, Sex, DOB, Tissue.Collection.Date, `Batch.GDF11/MSTN`) %>%
-                  rename(mouse.id = Mouse.Number,
-                         batch = `Batch.GDF11/MSTN`) %>%
+                  dplyr::rename(mouse.id = Mouse.Number,
+                                batch = `Batch.GDF11/MSTN`) %>%
                   mutate(Sex = factor(Sex), batch = factor(batch)) %>%
                   `colnames<-`(tolower(colnames(.))) %>%
                   select(mouse.id, sex, batch, dob, tissue.collection.date)
@@ -65,21 +65,23 @@ annot.sample <- data %>%
 
 ### Raw data formatting
 data <- data %>%
-          remove_rownames() %>%
-          column_to_rownames('Mouse.Number') %>% 
           select(-Sex, -DOB, -Tissue.Collection.Date, -`Batch.GDF11/MSTN`) %>%
           select(-grep('LV|Fraction|Stroke|Cardiac.Output', colnames(.))) %>%
-          rename(body.weight    = Body.Weight.g,
-                 heart.weight   = Heart.Weight.mg,
-                 tibia.length   = Tibia.Length.mm,
-                 hw.bw.percent  = `HW/BW.%`,
-                 hw.bw.ratio    = `HW/BW.mg/g`,
-                 hw.tl.ratio    = `HW/TL.mg/mm`,
-                 GDF11          = `GDF11.ng/mL`,
-                 MSTN           = `MSTN.ng/mL`,
-                 wall.thickness = `Wall.Thickness.µm`,
-                 cardiomyocyte.cross.sectional.area = `Cardiomyocyte.Cross.Sectional.Area.µm2`,
-                 percent.fibrosis = `Percent.Fibrosis.% area`)
+          dplyr::rename(body.weight    = Body.Weight.g,
+                        heart.weight   = Heart.Weight.mg,
+                        tibia.length   = Tibia.Length.mm,
+                        hw.bw.percent  = `HW/BW.%`,
+                        hw.bw.ratio    = `HW/BW.mg/g`,
+                        hw.tl.ratio    = `HW/TL.mg/mm`,
+                        GDF11          = `GDF11.ng/mL`,
+                        MSTN           = `MSTN.ng/mL`,
+                        wall.thickness = `Wall.Thickness.µm`,
+                        cardiomyocyte.cross.sectional.area = `Cardiomyocyte.Cross.Sectional.Area.µm2`,
+                        percent.fibrosis = `Percent.Fibrosis.% area`) %>%
+          mutate(hw.adj.bw = heart.weight,
+                 hw.adj.tl = heart.weight) %>%
+          remove_rownames() %>%
+          column_to_rownames('Mouse.Number')
 
 
 
@@ -99,18 +101,18 @@ temp <- cbind(model.matrix(~sex, data = annot.sample)[,-1,drop = FALSE], norm)
 fit  <- lm(heart.weight ~ sexM + body.weight, data = temp, na.action = na.exclude)
 coef <- coefficients(fit)
 res  <- residuals(fit)
-hw.adj.bw <- t(coef[1] + (coef[2] %*% temp[,names(coef)[2]]) + res)
+hw.reg.bw <- t(coef[1] + (coef[2] %*% temp[,names(coef)[2]]) + res)
 
 ### Regress out tibia length in heart weight data
 fit  <- lm(heart.weight ~ sexM + tibia.length, data = temp, na.action = na.exclude)
 coef <- coefficients(fit)
 res  <- residuals(fit)
-hw.adj.tl <- t(coef[1] + (coef[2] %*% temp[,names(coef)[2]]) + res)
+hw.reg.tl <- t(coef[1] + (coef[2] %*% temp[,names(coef)[2]]) + res)
 
 
 
 ### Combined adjusted values to normalized data
-norm <- cbind(norm, hw.adj.bw, hw.adj.tl)
+norm <- cbind(norm, hw.reg.bw, hw.reg.tl)
 
 
 
@@ -143,6 +145,11 @@ rz = apply(norm, 2, rankZ)
 covar.matrix <- model.matrix(~ sex + batch, data = annot.sample)[, -1, drop = FALSE]
 colnames(covar.matrix) <- c('sex', 'batch')
 rownames(covar.matrix) <- annot.sample$mouse.id
+
+stopifnot(rownames(norm) == rownames(covar.matrix))
+covar.matrix <- cbind(covar.matrix, norm[,c('body.weight','tibia.length')])
+
+
 
 
 
@@ -180,22 +187,22 @@ annot.phenotype <- data.frame(data.name      = c(colnames(annot.sample), colname
                                                  '(Heart weight / 100) / (Body weight / 100)', 'Heart weight to body weight ratio',
                                                  'Heart weight to tibia length ratio', 'GDF11 levels', 'MSTN levels', 'Thickness of heart wall measured in micrometer',
                                                  'Cardiomyocyte cross sectional area', 'Fibrosis percentage', 'Heart weight conditioned on body weight',
-                                                 'Heart weight conditioned on tibia length'),
-                              units          = c(rep(NA, ncol(annot.sample)), 'g', 'mg', 'mm', '%', 'mg/g', 'mg/mm', 'ng/mL', 'ng/mL', 'µm', 'µm2', '% area', NA, NA),
+                                                 'Heart weight conditioned on tibia length', 'Heart weight with body weight regressed out', 'Heart weight with tibia length regressed out'),
+                              units          = c(rep(NA, ncol(annot.sample)), 'g', 'mg', 'mm', '%', 'mg/g', 'mg/mm', 'ng/mL', 'ng/mL', 'µm', 'µm2', '% area', NA, NA, NA, NA),
                               category       = c(rep('Demographic', ncol(annot.sample)), rep('Phenotype', ncol(norm))),
                               R.category     = c(rep('Demographic', ncol(annot.sample)), rep('Phenotype', ncol(norm))),
                               is.id          = c(TRUE, rep(FALSE, ncol(annot.sample) + ncol(norm) - 1)),
                               is.numeric     = c(rep(FALSE, ncol(annot.sample)), rep(TRUE, ncol(norm))),
                               is.date        = c(FALSE, FALSE , FALSE, TRUE, TRUE, rep(FALSE, ncol(norm))),
-                              is.factor      = c(FALSE, TRUE, TRUE, FALSE , FALSE, rep(TRUE, ncol(norm))),
+                              is.factor      = c(FALSE, TRUE, TRUE, FALSE , FALSE, rep(FALSE, ncol(norm))),
                               factor.levels  = c(NA, 'F:M', '1:2', NA, NA, rep(NA, ncol(norm))),
                               is.covar       = c(FALSE, TRUE, TRUE, FALSE , FALSE, rep(FALSE, ncol(norm))),
                               is.pheno       = c(rep(FALSE, ncol(annot.sample)), rep(TRUE, ncol(norm))),
                               is.derived     = c(rep(FALSE, ncol(annot.sample)), FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, rep(FALSE, ncol(norm) - 8), TRUE, TRUE),
                               omit           = FALSE,
-                              use.covar      = c(rep(NA, ncol(annot.sample)), rep('sex', 6), 'sex:batch', 'sex:batch', rep('sex', 5)),
+                              use.covar      = c(rep(NA, ncol(annot.sample)), rep('sex', 6), 'sex:batch', 'sex:batch', rep('sex', 3), 'sex:body.weight', 'sex:tibia.length', 'sex', 'sex'),
                               transformation = c(rep(NA, ncol(annot.sample)), rep('log', ncol(norm))),
-                              adj.pheno      = c(rep(NA, ncol(annot.sample)), rep(NA, ncol(norm) - 2), 'body.weight', 'tibia.length'))
+                              adj.pheno      = c(rep(NA, ncol(annot.sample)), rep(NA, ncol(norm) - 4), 'body.weight', 'tibia.length', NA, NA))
 
 
 
@@ -219,7 +226,7 @@ dataset.heart.phenotype <- list(annot.phenotype = as_tibble(annot.phenotype),
                                 covar.matrix    = covar.matrix,
                                 covar.info      = as_tibble(covar.info),
                                 data            = list(raw  = as.matrix(data),
-                                                       norm = as.matrix(norm),
+                                                       log  = as.matrix(norm),
                                                        rz   = as.matrix(rz)),
                                 datatype        = 'phenotype',
                                 display.name    = 'Heart physiological phenotypes',
@@ -233,5 +240,4 @@ dataset.heart.phenotype <- list(annot.phenotype = as_tibble(annot.phenotype),
 
 ### Save
 rm(list = ls()[!grepl('dataset[.]|genoprobs|K|map|markers', ls())])
-save.image(file = 'pazdro_heart_phenotype_viewer_v1.Rdata')                              
-                              
+save.image(file = 'pazdro_heart_phenotype_viewer_v1.Rdata')          
