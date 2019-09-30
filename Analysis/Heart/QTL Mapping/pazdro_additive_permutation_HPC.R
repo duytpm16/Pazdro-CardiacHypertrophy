@@ -56,13 +56,13 @@ expr <- get(dataset)$data$norm
 
 
 ### Get covariates
-if(pheno_name %in% c('GDF11', 'MSTN'){
+if(pheno_name %in% c('GDF11', 'MSTN')){
    covar <- get(dataset)$covar.matrix[,c('sex','batch')]
 }
-if(pheno_name %in% c('hw.adj.bw'){
+if(pheno_name %in% c('hw.adj.bw')){
    covar <- get(dataset)$covar.matrix[,c('sex','body.weight')]
 }
-if(pheno_name %in% c('hw.adj.tl'){
+if(pheno_name %in% c('hw.adj.tl')){
    covar <- get(dataset)$covar.matrix[,c('sex','tibia.length')]
 }
 if(!pheno_name %in% c('GDF11', 'MSTN', 'hw.adj.bw', 'hw.adj.tl')){
