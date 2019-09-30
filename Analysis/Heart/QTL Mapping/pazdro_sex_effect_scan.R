@@ -41,15 +41,18 @@ add_scan1 <- readRDS('pazdro_heart_phenotype_additive_scan1_matrix.rds')
 
 
 ### Extract log-transformed expression data
-expr <- get(dataset)$data$norm
-phys <- expr %>% as.data.frame() %>% select(-GDF11, -MSTN)
+expr <- get(dataset)$data$log
+phys <- expr %>% as.data.frame() %>% select(-GDF11, -MSTN, -hw.adj.bw, -hw.adj.tl)
 prot <- expr %>% as.data.frame() %>% select(GDF11, MSTN)
-
+hw.adj.bw <- expr %>% as.data.frame() %>% select(hw.adj.bw)
+hw.adj.tl <- expr %>% as.data.frame() %>% select(hw.adj.tl)
 
 ### Covar contains both sex and batch. Will use this for GDF11 and MSTN mapping.
 #     Other phenotypes will be adjusted by sex (sex.covar) only.
-covar <- get(dataset)$covar.matrix
-sex.covar <- get(dataset)$covar.matrix[,'sex', drop = FALSE]
+prot.covar <- get(dataset)$covar.matrix[,c('sex','batch'), drop = FALSE]
+sex.covar  <- get(dataset)$covar.matrix[,'sex', drop = FALSE]
+bw.covar   <- get(dataset)$covar.matrix[,c('sex','body.weight'), drop = FALSE]
+tl.covar   <- get(dataset)$covar.matrix[,c('sex','tibia.length'), drop = FALSE]
 
 
 
@@ -64,11 +67,9 @@ sex.covar <- get(dataset)$covar.matrix[,'sex', drop = FALSE]
 prot_scan1 <- scan1(genoprobs = genoprobs,
                     pheno     = prot,
                     kinship   = K,
-                    addcovar  = covar,
+                    addcovar  = prot.covar,
                     intcovar  = sex.covar,
                     cores     = 5)
-
-
 
 ### Map heart physiological phenotypes
 phys_scan1 <- scan1(genoprobs = genoprobs,
@@ -78,14 +79,36 @@ phys_scan1 <- scan1(genoprobs = genoprobs,
                     intcovar  = sex.covar,
                     cores     = 5)
 
+### Map heart weight adjusting for bodyweight
+hw.bw_scan1 <- scan1(genoprobs = genoprobs,
+                     pheno     = hw.adj.bw,
+                     kinship   = K,
+                     addcovar  = bw.covar,
+                     intcovar  = sex.covar,
+                     cores     = 5)
+
+
+### Map heart weight adjusting for bodyweight
+hw.tl_scan1 <- scan1(genoprobs = genoprobs,
+                     pheno     = hw.adj.tl,
+                     kinship   = K,
+                     addcovar  = tl.covar,
+                     intcovar  = sex.covar,
+                     cores     = 5)
+
 ### Combine scan1 outputs
-scan1_out <- cbind(prot_scan1, phys_scan1)
+scan1_out <- cbind(prot_scan1, phys_scan1, hw.bw_scan1, hw.tl_scan1)
 
+
+
+
+
+
+
+### Get sex-effects QTLs
 stopifnot(colnames(add_scan1) == colnames(scan1_out))
+stopifnot(rownames(add_scan1) == rownames(scan1_out))
 diff <- scan1_out - add_scan1
-
-
-
 
 
 
