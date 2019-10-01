@@ -47,10 +47,13 @@ data <- readRDS('~/Desktop/Pazdro Cardiac Hypertrophy/Phenotype/Modified Phenoty
 
 ### Create samples dataframe
 annot.sample <- data %>% 
-                  select(Mouse.Number, Sex, DOB, Tissue.Collection.Date, `Batch.GDF11/MSTN`) %>%
+                  select(Mouse.Number, Sex, DOB, Tissue.Collection.Date, `Batch.GDF11/MSTN`, Body.Weight.g, Tibia.Length.mm) %>%
                   dplyr::rename(mouse.id = Mouse.Number,
-                                batch = `Batch.GDF11/MSTN`) %>%
-                  mutate(Sex = factor(Sex), batch = factor(batch)) %>%
+                                batch = `Batch.GDF11/MSTN`,
+                                body.weight = Body.Weight.g,
+                                tibia.length = Tibia.Length.mm) %>%
+                  mutate(Sex = factor(Sex), batch = factor(batch),
+                         body.weight = log(body.weight), tibia.length = log(tibia.length)) %>%
                   `colnames<-`(tolower(colnames(.))) %>%
                   select(mouse.id, sex, batch, dob, tissue.collection.date)
 
@@ -156,12 +159,12 @@ covar.matrix <- cbind(covar.matrix, norm[,c('body.weight','tibia.length')])
 
 
 ### Covar info
-covar.info <- data.frame(sample.column = c('sex', 'batch'),
-                         covar.column  = c('sex', 'batch'),
-                         display.name  = c('Sex', 'Batch'),
-                         interactive   = c(TRUE, FALSE),
-                         primary       = c('sex', NA),
-                         lod.peaks     = c('sex_int', NA))
+covar.info <- data.frame(sample.column = c('sex', 'batch', 'body.weight', 'tibia.length'),
+                         covar.column  = c('sex', 'batch', 'body.weight', 'tibia.length'),
+                         display.name  = c('Sex', 'Batch', 'Body Weight', 'Tibia Length'),
+                         interactive   = c(TRUE, FALSE, FALSE, FALSE),
+                         primary       = c(TRUE, FALSE, FALSE, FALSE),
+                         lod.peaks     = c('sex_int', NA, NA, NA))
 
 
 
@@ -240,4 +243,4 @@ dataset.heart.phenotype <- list(annot.phenotype = as_tibble(annot.phenotype),
 
 ### Save
 rm(list = ls()[!grepl('dataset[.]|genoprobs|K|map|markers', ls())])
-save.image(file = 'pazdro_heart_phenotype_viewer_v1.Rdata')          
+save.image(file = 'pazdro_heart_phenotype_viewer_v1.RData')          
