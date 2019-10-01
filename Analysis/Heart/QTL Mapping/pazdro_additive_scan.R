@@ -138,10 +138,10 @@ for(i in 1:nrow(peaks)){
                       'hw.adj.tl' = tl.covar,
                       sex.covar)
  
-  peaks[i,LETTERS[1:8]] <- scan1blup(genoprobs = gp,
-                                     pheno     = expr[,peaks$data.name[i], drop = FALSE],
-                                     kinship   = K[[peaks$chr[i]]],
-                                     addcovar  = covar)[,LETTERS[1:8]]      
+    peaks[i,LETTERS[1:8]] <- scan1blup(genoprobs = gp,
+                                       pheno     = expr[,peaks$data.name[i], drop = FALSE],
+                                       kinship   = K[[peaks$chr[i]]],
+                                       addcovar  = covar)[,LETTERS[1:8]]      
     
 }
 
