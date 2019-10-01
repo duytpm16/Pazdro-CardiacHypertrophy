@@ -91,7 +91,7 @@ if(!pheno_name %in% c('GDF11', 'MSTN', 'hw.adj.bw', 'hw.adj.tl')){
 perm <- scan1perm(genoprobs = genoprobs,
                   pheno     = expr[, pheno_name, drop = FALSE],
                   kinship   = K,
-                  covar     = covar,
+                  addcovar  = covar,
                   n_perm    = n_perm,
                   cores     = cores)
 
