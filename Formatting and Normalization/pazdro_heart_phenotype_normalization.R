@@ -186,7 +186,7 @@ sample.col <- colnames(annot.sample)[-c(1:2)]
 annot.phenotype <- data.frame(data.name      = c(sample.col, colnames(norm)),
                               short.name     = c(sample.col, colnames(norm)),
                               R.name         = c(sample.col, colnames(norm)),
-                              description    = c('Mouse identifier', 'Sex of mouse: Female (F) or Male (M)', 'Mass spectromery batch group for GDF11 and MSTN', 'Mouse data-of-birth', 'Tissue collection date',
+                              description    = c('Mouse identifier', 'Sex of mouse: Female (F) or Male (M)', 'Mass spectrometry batch group for GDF11 and MSTN', 'Mouse data-of-birth', 'Tissue collection date',
                                                  'Body weight measured in grams', 'Heart weight measured in milligrams', ' Tibia length measured in millimeters', 
                                                  '(Heart weight / 100) / (Body weight / 100)', 'Heart weight to body weight ratio',
                                                  'Heart weight to tibia length ratio', 'GDF11 levels', 'MSTN levels', 'Thickness of heart wall measured in micrometer',
