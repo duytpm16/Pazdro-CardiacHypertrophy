@@ -136,4 +136,4 @@ dataset.heart.phenotype$heritability$chr <- as.data.frame(chr_herit)
 
 ### Save .Rdata
 rm(list = ls()[!grepl('dataset[.]|genoprobs|K|map|markers', ls())])
-save.image(file = 'pazdro_heart_phenotype_viewer_v1.Rdata') 
+save.image(file = 'pazdro_heart_phenotype_viewer_v1.RData') 
