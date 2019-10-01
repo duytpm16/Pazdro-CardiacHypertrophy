@@ -146,4 +146,4 @@ saveRDS(diff, file = 'pazdro_heart_phenotype_sex_effect_scan1_matrix.rds')
 
 ### Save .Rdata
 rm(list = ls()[!grepl('dataset[.]|genoprobs|K|map|markers', ls())])
-save.image(file = 'pazdro_heart_phenotype_viewer_v1.Rdata') 
+save.image(file = 'pazdro_heart_phenotype_viewer_v1.RData') 
