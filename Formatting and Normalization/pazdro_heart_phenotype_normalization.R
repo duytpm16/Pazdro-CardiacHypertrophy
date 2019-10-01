@@ -55,7 +55,7 @@ annot.sample <- data %>%
                   mutate(Sex = factor(Sex), batch = factor(batch),
                          body.weight = log(body.weight), tibia.length = log(tibia.length)) %>%
                   `colnames<-`(tolower(colnames(.))) %>%
-                  select(mouse.id, sex, batch, dob, tissue.collection.date)
+                  select(mouse.id, sex, batch, dob, tissue.collection.date, body.weight, tibia.length)
 
 
 
@@ -182,7 +182,7 @@ covar.info <- data.frame(sample.column = c('sex', 'batch', 'body.weight', 'tibia
 
 
 ### Creating annot.phenotype dataframe
-sample.col <- colnames(annot.sample)[-c(1:2)]
+sample.col <- colnames(annot.sample)[-c(6:7)]
 annot.phenotype <- data.frame(data.name      = c(sample.col, colnames(norm)),
                               short.name     = c(sample.col, colnames(norm)),
                               R.name         = c(sample.col, colnames(norm)),
@@ -195,7 +195,7 @@ annot.phenotype <- data.frame(data.name      = c(sample.col, colnames(norm)),
                               units          = c(rep(NA, length(sample.col)), 'g', 'mg', 'mm', '%', 'mg/g', 'mg/mm', 'ng/mL', 'ng/mL', 'µm', 'µm2', '% area', NA, NA, NA, NA),
                               category       = c(rep('Demographic', length(sample.col)), rep('Phenotype', ncol(norm))),
                               R.category     = c(rep('Demographic', length(sample.col)), rep('Phenotype', ncol(norm))),
-                              is.id          = c(TRUE, rep(FALSE, length(sample.col)) + ncol(norm) - 1)),
+                              is.id          = c(TRUE, rep(FALSE, length(sample.col) + ncol(norm) - 1)),
                               is.numeric     = c(rep(FALSE, length(sample.col)), rep(TRUE, ncol(norm))),
                               is.date        = c(FALSE, FALSE , FALSE, TRUE, TRUE, rep(FALSE, ncol(norm))),
                               is.factor      = c(FALSE, TRUE, TRUE, FALSE , FALSE, rep(FALSE, ncol(norm))),
@@ -244,4 +244,4 @@ dataset.heart.phenotype <- list(annot.phenotype = as_tibble(annot.phenotype),
 
 ### Save
 rm(list = ls()[!grepl('dataset[.]|genoprobs|K|map|markers', ls())])
-save.image(file = 'pazdro_heart_phenotype_viewer_v1.RData')          
+#save.image(file = 'pazdro_heart_phenotype_viewer_v1.RData')        
