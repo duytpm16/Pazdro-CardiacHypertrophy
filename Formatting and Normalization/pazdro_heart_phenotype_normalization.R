@@ -244,4 +244,4 @@ dataset.heart.phenotype <- list(annot.phenotype = as_tibble(annot.phenotype),
 
 ### Save
 rm(list = ls()[!grepl('dataset[.]|genoprobs|K|map|markers', ls())])
-#save.image(file = 'pazdro_heart_phenotype_viewer_v1.RData')        
+save.image(file = 'pazdro_heart_phenotype_viewer_v1.RData')        
