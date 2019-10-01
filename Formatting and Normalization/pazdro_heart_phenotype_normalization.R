@@ -182,30 +182,31 @@ covar.info <- data.frame(sample.column = c('sex', 'batch', 'body.weight', 'tibia
 
 
 ### Creating annot.phenotype dataframe
-annot.phenotype <- data.frame(data.name      = c(colnames(annot.sample), colnames(norm)),
-                              short.name     = c(colnames(annot.sample), colnames(norm)),
-                              R.name         = c(colnames(annot.sample), colnames(norm)),
+sample.col <- colnames(annot.sample)[-c(1:2)]
+annot.phenotype <- data.frame(data.name      = c(sample.col, colnames(norm)),
+                              short.name     = c(sample.col, colnames(norm)),
+                              R.name         = c(sample.col, colnames(norm)),
                               description    = c('Mouse identifier', 'Sex of mouse: Female (F) or Male (M)', 'Mass spectromery batch group for GDF11 and MSTN', 'Mouse data-of-birth', 'Tissue collection date',
                                                  'Body weight measured in grams', 'Heart weight measured in milligrams', ' Tibia length measured in millimeters', 
                                                  '(Heart weight / 100) / (Body weight / 100)', 'Heart weight to body weight ratio',
                                                  'Heart weight to tibia length ratio', 'GDF11 levels', 'MSTN levels', 'Thickness of heart wall measured in micrometer',
                                                  'Cardiomyocyte cross sectional area', 'Fibrosis percentage', 'Heart weight conditioned on body weight',
                                                  'Heart weight conditioned on tibia length', 'Heart weight with body weight regressed out', 'Heart weight with tibia length regressed out'),
-                              units          = c(rep(NA, ncol(annot.sample)), 'g', 'mg', 'mm', '%', 'mg/g', 'mg/mm', 'ng/mL', 'ng/mL', 'µm', 'µm2', '% area', NA, NA, NA, NA),
-                              category       = c(rep('Demographic', ncol(annot.sample)), rep('Phenotype', ncol(norm))),
-                              R.category     = c(rep('Demographic', ncol(annot.sample)), rep('Phenotype', ncol(norm))),
-                              is.id          = c(TRUE, rep(FALSE, ncol(annot.sample) + ncol(norm) - 1)),
-                              is.numeric     = c(rep(FALSE, ncol(annot.sample)), rep(TRUE, ncol(norm))),
+                              units          = c(rep(NA, length(sample.col)), 'g', 'mg', 'mm', '%', 'mg/g', 'mg/mm', 'ng/mL', 'ng/mL', 'µm', 'µm2', '% area', NA, NA, NA, NA),
+                              category       = c(rep('Demographic', length(sample.col)), rep('Phenotype', ncol(norm))),
+                              R.category     = c(rep('Demographic', length(sample.col)), rep('Phenotype', ncol(norm))),
+                              is.id          = c(TRUE, rep(FALSE, length(sample.col)) + ncol(norm) - 1)),
+                              is.numeric     = c(rep(FALSE, length(sample.col)), rep(TRUE, ncol(norm))),
                               is.date        = c(FALSE, FALSE , FALSE, TRUE, TRUE, rep(FALSE, ncol(norm))),
                               is.factor      = c(FALSE, TRUE, TRUE, FALSE , FALSE, rep(FALSE, ncol(norm))),
                               factor.levels  = c(NA, 'F:M', '1:2', NA, NA, rep(NA, ncol(norm))),
                               is.covar       = c(FALSE, TRUE, TRUE, FALSE , FALSE, rep(FALSE, ncol(norm))),
-                              is.pheno       = c(rep(FALSE, ncol(annot.sample)), rep(TRUE, ncol(norm))),
-                              is.derived     = c(rep(FALSE, ncol(annot.sample)), FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, rep(FALSE, ncol(norm) - 8), TRUE, TRUE),
+                              is.pheno       = c(rep(FALSE, length(sample.col)), rep(TRUE, ncol(norm))),
+                              is.derived     = c(rep(FALSE, length(sample.col)), FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, rep(FALSE, ncol(norm) - 8), TRUE, TRUE),
                               omit           = FALSE,
-                              use.covar      = c(rep(NA, ncol(annot.sample)), rep('sex', 6), 'sex:batch', 'sex:batch', rep('sex', 3), 'sex:body.weight', 'sex:tibia.length', 'sex', 'sex'),
-                              transformation = c(rep(NA, ncol(annot.sample)), rep('log', ncol(norm))),
-                              adj.pheno      = c(rep(NA, ncol(annot.sample)), rep(NA, ncol(norm) - 4), 'body.weight', 'tibia.length', NA, NA))
+                              use.covar      = c(rep(NA, length(sample.col)), rep('sex', 6), 'sex:batch', 'sex:batch', rep('sex', 3), 'sex:body.weight', 'sex:tibia.length', 'sex', 'sex'),
+                              transformation = c(rep(NA, length(sample.col)), rep('log', ncol(norm))),
+                              adj.pheno      = c(rep(NA, length(sample.col)), rep(NA, ncol(norm) - 4), 'body.weight', 'tibia.length', NA, NA))
 
 
 
@@ -226,7 +227,7 @@ annot.phenotype <- data.frame(data.name      = c(colnames(annot.sample), colname
 ### Format for QTL viewer
 dataset.heart.phenotype <- list(annot.phenotype = as_tibble(annot.phenotype),
                                 annot.samples   = as_tibble(annot.sample),
-                                covar.matrix    = covar.matrix,
+                                covar.matrix    = as.matrix(covar.matrix),
                                 covar.info      = as_tibble(covar.info),
                                 data            = list(raw  = as.matrix(data),
                                                        log  = as.matrix(norm),
